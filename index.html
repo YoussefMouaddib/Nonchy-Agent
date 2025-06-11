@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nonchy Assistant</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      background-color: #1f1f1f;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .message {
+      margin-bottom: 1rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .input-area {
+      display: flex;
+      padding: 0.75rem;
+      background-color: #1f1f1f;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+    button {
+      background-color: #3f51b5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>Hey Nonchy 👋</header>
+  <main id="chat">
+    <div class="message">Good morning! I'm loading your project memory...</div>
+  </main>
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Talk or type here...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    async function sendMessage() {
+  const input = document.getElementById("userInput");
+  const chat = document.getElementById("chat");
+  const text = input.value.trim();
+  if (!text) return;
+
+  const userMsg = document.createElement("div");
+  userMsg.className = "message";
+  userMsg.textContent = "You: " + text;
+  chat.appendChild(userMsg);
+
+  input.value = "";
+
+  const res = await fetch("/interact", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ user_input: text })
+  });
+
+  const data = await res.json();
+  const aiMsg = document.createElement("div");
+  aiMsg.className = "message";
+  aiMsg.textContent = "Assistant: " + data.response;
+  chat.appendChild(aiMsg);
+
+  chat.scrollTop = chat.scrollHeight;
+}
+  </script>
+</body>
+</html>
